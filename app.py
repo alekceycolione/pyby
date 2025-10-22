@@ -49,8 +49,12 @@ def scrape_endpoint():
         
         # Setup driver and scrape
         logger.info("🚀 Configurando driver do Chrome...")
+        driver = None
         try:
             driver = setup_driver()
+            if driver is None:
+                logger.error("❌ setup_driver retornou None")
+                return jsonify({'error': 'Erro ao configurar navegador: Driver não foi inicializado'}), 500
             logger.info("✅ Driver configurado com sucesso")
         except Exception as e:
             logger.error(f"❌ Erro ao configurar driver: {str(e)}")
@@ -58,6 +62,11 @@ def scrape_endpoint():
             return jsonify({'error': f'Erro ao configurar navegador: {str(e)}'}), 500
         
         try:
+            # Validar se o driver está funcionando
+            if not hasattr(driver, 'get') or not callable(getattr(driver, 'get')):
+                logger.error("❌ Driver não possui método 'get' válido")
+                return jsonify({'error': 'Driver do navegador inválido'}), 500
+                
             logger.info(f"🔍 Iniciando scraping para '{search_term}'...")
             products = scrape_products(driver, search_term)
             logger.info(f"📊 Scraping concluído. {len(products)} produtos encontrados")
@@ -112,11 +121,14 @@ def scrape_endpoint():
             return jsonify({'error': f'Erro durante a busca: {str(e)}'}), 500
             
         finally:
-            try:
-                driver.quit()
-                logger.info("🔒 Driver fechado com sucesso")
-            except Exception as e:
-                logger.warning(f"⚠️ Erro ao fechar driver: {str(e)}")
+            if driver is not None:
+                try:
+                    driver.quit()
+                    logger.info("🔒 Driver fechado com sucesso")
+                except Exception as e:
+                    logger.warning(f"⚠️ Erro ao fechar driver: {str(e)}")
+            else:
+                logger.info("ℹ️ Driver era None, não foi necessário fechar")
             
     except Exception as e:
         logger.error(f"💥 Erro crítico na aplicação: {str(e)}")

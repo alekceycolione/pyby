@@ -1,4 +1,11 @@
 
+import logging
+import requests
+from bs4 import BeautifulSoup
+import json
+import time
+import re
+import os
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
@@ -6,13 +13,13 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, WebDriverException, NoSuchElementException
-from webdriver_manager.chrome import ChromeDriverManager
-from bs4 import BeautifulSoup
-import json
-import time
-import re
-import os
-import logging
+
+try:
+    from webdriver_manager.chrome import ChromeDriverManager
+except ImportError as e:
+    logger = logging.getLogger(__name__)
+    logger.warning(f"⚠️ webdriver_manager não disponível: {str(e)}")
+    ChromeDriverManager = None
 
 # Configurar logging para o scraper
 logger = logging.getLogger(__name__)
@@ -31,34 +38,84 @@ def setup_driver():
     chrome_options.add_argument("--disable-javascript")
     chrome_options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
     
-    # Usar webdriver-manager para gerenciar o ChromeDriver automaticamente
-    logger.info("📥 Instalando/configurando ChromeDriver...")
-    try:
-        service = Service(ChromeDriverManager().install())
-        logger.info("✅ ChromeDriver configurado via webdriver-manager")
-    except Exception as e:
-        logger.warning(f"⚠️ Falha no webdriver-manager: {str(e)}")
-        logger.info("🔄 Tentando caminho local do ChromeDriver...")
-        # Fallback para caminho local se webdriver-manager falhar
-        service = Service("/opt/homebrew/bin/chromedriver")
-        logger.info("✅ Usando ChromeDriver local")
+    # Tentar múltiplas estratégias para configurar o driver
+    driver = None
     
+    # Estratégia 1: webdriver-manager (se disponível)
+    if ChromeDriverManager is not None:
+        logger.info("📥 Tentativa 1: Instalando/configurando ChromeDriver via webdriver-manager...")
+        try:
+            service = Service(ChromeDriverManager().install())
+            driver = webdriver.Chrome(service=service, options=chrome_options)
+            logger.info("✅ ChromeDriver configurado via webdriver-manager")
+            return driver
+        except Exception as e:
+            logger.warning(f"⚠️ Falha na tentativa 1: {str(e)}")
+    else:
+        logger.info("⏭️ Pulando tentativa 1: webdriver-manager não disponível")
+    
+    # Estratégia 2: Caminho padrão do Render
+    logger.info("🔄 Tentativa 2: Usando caminho padrão do Render...")
     try:
+        service = Service("/usr/bin/chromedriver")
         driver = webdriver.Chrome(service=service, options=chrome_options)
-        logger.info("🚀 Driver do Chrome iniciado com sucesso")
+        logger.info("✅ ChromeDriver configurado no caminho do Render")
         return driver
-    except ImportError as e:
-        logger.error(f"Erro de importação ao configurar driver: {e}")
-        logger.error("Verifique se o Chrome está instalado e o webdriver-manager está disponível")
-        return None
-    except FileNotFoundError as e:
-        logger.error(f"ChromeDriver não encontrado: {e}")
-        logger.error("Tentando usar ChromeDriver do sistema...")
-        return None
     except Exception as e:
-        logger.error(f"Erro inesperado ao configurar driver: {e}")
-        logger.error(f"Tipo do erro: {type(e).__name__}")
-        return None
+        logger.warning(f"⚠️ Falha na tentativa 2: {str(e)}")
+    
+    # Estratégia 3: Caminho local (para desenvolvimento)
+    logger.info("🔄 Tentativa 3: Usando caminho local...")
+    try:
+        service = Service("/opt/homebrew/bin/chromedriver")
+        driver = webdriver.Chrome(service=service, options=chrome_options)
+        logger.info("✅ ChromeDriver configurado no caminho local")
+        return driver
+    except Exception as e:
+        logger.warning(f"⚠️ Falha na tentativa 3: {str(e)}")
+    
+    # Estratégia 4: Sem service específico
+    logger.info("🔄 Tentativa 4: Usando driver sem service específico...")
+    try:
+        driver = webdriver.Chrome(options=chrome_options)
+        logger.info("✅ ChromeDriver configurado sem service específico")
+        return driver
+    except Exception as e:
+        logger.warning(f"⚠️ Falha na tentativa 4: {str(e)}")
+    
+    # Se todas as tentativas falharam, implementar fallback sem Selenium
+    logger.error("❌ Todas as tentativas de configurar o ChromeDriver falharam")
+    logger.info("🔄 Implementando fallback: scraping sem Selenium usando requests")
+    
+    # Retornar um objeto mock que simula o driver para o fallback
+    class MockDriver:
+        def __init__(self):
+            self.session = requests.Session()
+            self.session.headers.update({
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            })
+            logger.info("✅ Fallback configurado: usando requests em vez de Selenium")
+        
+        def get(self, url):
+            logger.info(f"🌐 Fallback: Fazendo requisição HTTP para {url}")
+            response = self.session.get(url, timeout=30)
+            response.raise_for_status()
+            self.page_source = response.text
+            logger.info("✅ Fallback: Página carregada com sucesso")
+        
+        def quit(self):
+            logger.info("🔒 Fallback: Fechando sessão requests")
+            self.session.close()
+        
+        def find_element(self, by, value):
+            # Método dummy para compatibilidade
+            raise NoSuchElementException(f"Fallback mode: elemento {value} não encontrado")
+        
+        def find_elements(self, by, value):
+            # Método dummy para compatibilidade
+            return []
+    
+    return MockDriver()
 
 def clean_price(price_str):
     if not price_str: return 'N/A'
@@ -103,38 +160,45 @@ def scrape_products(driver, search_term):
         logger.error(f"Tipo do erro: {type(e).__name__}")
         raise
 
-    # Aceitar cookies, se presente
+    # Aceitar cookies, se presente (apenas para Selenium real)
     logger.info("🍪 Verificando banner de cookies...")
     try:
-        cookie_button = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'ENTENDI')] | //button[contains(text(), 'Estou de Acordo')] | //*[@id='btn-cookie-allow']"))
-        )
-        cookie_button.click()
-        logger.info("✅ Banner de cookies aceito")
+        # Verificar se é o MockDriver (fallback)
+        if hasattr(driver, 'session'):
+            logger.info("⏭️ Fallback mode: pulando verificação de cookies")
+        else:
+            cookie_button = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'ENTENDI')] | //button[contains(text(), 'Estou de Acordo')] | //*[@id='btn-cookie-allow']"))
+            )
+            cookie_button.click()
+            logger.info("✅ Banner de cookies aceito")
         time.sleep(2) # Dar um tempo para o banner de cookies sumir
     except Exception as e:
         logger.info("ℹ️ Banner de cookies não encontrado ou já aceito")
 
     products_data = []
     
-    # Rolar a página para carregar mais produtos (se houver lazy loading)
+    # Rolar a página para carregar mais produtos (apenas para Selenium real)
     logger.info("📜 Iniciando scroll para carregar produtos...")
-    last_height = driver.execute_script("return document.body.scrollHeight")
-    scroll_attempts = 0
-    max_scroll_attempts = 5 # Ajustar conforme necessário
-    
-    while scroll_attempts < max_scroll_attempts:
-        logger.debug(f"📜 Scroll tentativa {scroll_attempts + 1}/{max_scroll_attempts}")
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(3)  # Esperar o conteúdo carregar
-        new_height = driver.execute_script("return document.body.scrollHeight")
-        if new_height == last_height:
-            logger.info("📜 Fim da página atingido")
-            break
-        last_height = new_height
-        scroll_attempts += 1
-    
-    logger.info(f"📜 Scroll concluído após {scroll_attempts} tentativas")
+    if hasattr(driver, 'session'):
+        logger.info("⏭️ Fallback mode: pulando scroll (usando HTML estático)")
+    else:
+        last_height = driver.execute_script("return document.body.scrollHeight")
+        scroll_attempts = 0
+        max_scroll_attempts = 5 # Ajustar conforme necessário
+        
+        while scroll_attempts < max_scroll_attempts:
+            logger.debug(f"📜 Scroll tentativa {scroll_attempts + 1}/{max_scroll_attempts}")
+            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            time.sleep(3)  # Esperar o conteúdo carregar
+            new_height = driver.execute_script("return document.body.scrollHeight")
+            if new_height == last_height:
+                logger.info("📜 Fim da página atingido")
+                break
+            last_height = new_height
+            scroll_attempts += 1
+        
+        logger.info(f"📜 Scroll concluído após {scroll_attempts} tentativas")
 
     # Salvar o HTML da página para depuração
     logger.info("💾 Salvando HTML da página para debug...")

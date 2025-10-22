@@ -72,3 +72,45 @@
 2025-10-22 13:38:43,801 - INFO - 🎉 Busca concluída com sucesso! 20 produtos encontrados
 2025-10-22 13:38:43,876 - INFO - 🔒 Driver fechado com sucesso
 2025-10-22 13:38:43,877 - INFO - 127.0.0.1 - - [22/Oct/2025 13:38:43] "POST /scrape HTTP/1.1" 200 -
+2025-10-22 13:53:14,701 - INFO -  * Detected change in '/Users/alekceycolione/Documents/apps/extrair produtos do Compras Paraguai/scraper.py', reloading
+2025-10-22 13:53:14,747 - INFO -  * Restarting with stat
+2025-10-22 13:53:15,018 - WARNING -  * Debugger is active!
+2025-10-22 13:53:15,023 - INFO -  * Debugger PIN: 577-681-629
+2025-10-22 13:53:36,881 - INFO -  * Detected change in '/Users/alekceycolione/Documents/apps/extrair produtos do Compras Paraguai/app.py', reloading
+2025-10-22 13:53:36,898 - INFO -  * Restarting with stat
+2025-10-22 13:53:37,031 - WARNING -  * Debugger is active!
+2025-10-22 13:53:37,034 - INFO -  * Debugger PIN: 577-681-629
+2025-10-22 13:53:48,512 - INFO -  * Detected change in '/Users/alekceycolione/Documents/apps/extrair produtos do Compras Paraguai/app.py', reloading
+2025-10-22 13:53:48,533 - INFO -  * Restarting with stat
+2025-10-22 13:53:48,668 - WARNING -  * Debugger is active!
+2025-10-22 13:53:48,671 - INFO -  * Debugger PIN: 577-681-629
+2025-10-22 13:54:13,590 - INFO -  * Detected change in '/Users/alekceycolione/Documents/apps/extrair produtos do Compras Paraguai/scraper.py', reloading
+2025-10-22 13:54:13,607 - INFO -  * Restarting with stat
+2025-10-22 13:54:13,741 - WARNING -  * Debugger is active!
+2025-10-22 13:54:13,744 - INFO -  * Debugger PIN: 577-681-629
+2025-10-22 13:54:23,050 - INFO -  * Detected change in '/Users/alekceycolione/Documents/apps/extrair produtos do Compras Paraguai/scraper.py', reloading
+2025-10-22 13:54:23,071 - INFO -  * Restarting with stat
+2025-10-22 13:54:23,207 - WARNING -  * Debugger is active!
+2025-10-22 13:54:23,209 - INFO -  * Debugger PIN: 577-681-629
+2025-10-22 13:54:34,623 - INFO -  * Detected change in '/Users/alekceycolione/Documents/apps/extrair produtos do Compras Paraguai/scraper.py', reloading
+2025-10-22 13:54:34,642 - INFO -  * Restarting with stat
+2025-10-22 13:54:34,778 - WARNING -  * Debugger is active!
+2025-10-22 13:54:34,782 - INFO -  * Debugger PIN: 577-681-629
+2025-10-22 13:54:47,234 - INFO -  * Detected change in '/Users/alekceycolione/Documents/apps/extrair produtos do Compras Paraguai/scraper.py', reloading
+2025-10-22 13:54:47,252 - INFO -  * Restarting with stat
+2025-10-22 13:54:47,385 - WARNING -  * Debugger is active!
+2025-10-22 13:54:47,388 - INFO -  * Debugger PIN: 577-681-629
+2025-10-22 13:55:01,913 - INFO -  * Detected change in '/Users/alekceycolione/Documents/apps/extrair produtos do Compras Paraguai/scraper.py', reloading
+2025-10-22 13:55:01,932 - INFO -  * Restarting with stat
+2025-10-22 13:55:02,067 - WARNING -  * Debugger is active!
+2025-10-22 13:55:02,070 - INFO -  * Debugger PIN: 577-681-629
+2025-10-22 13:55:16,644 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.1.11:8080
+2025-10-22 13:55:16,644 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-22 13:55:16,645 - INFO -  * Restarting with stat
+2025-10-22 13:55:16,771 - WARNING -  * Debugger is active!
+2025-10-22 13:55:16,774 - INFO -  * Debugger PIN: 577-681-629
+2025-10-22 13:55:24,246 - INFO - 127.0.0.1 - - [22/Oct/2025 13:55:24] "GET /?ide_webview_request_time=1761152124240 HTTP/1.1" 200 -
+2025-10-22 13:55:24,313 - INFO - 127.0.0.1 - - [22/Oct/2025 13:55:24] "[33mGET /@vite/client HTTP/1.1[0m" 404 -

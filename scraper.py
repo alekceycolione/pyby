@@ -7,7 +7,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
-import pandas as pd
 import json
 import time
 import re
@@ -159,9 +158,14 @@ def scrape_products(driver, search_term):
     return products_data
 
 def save_to_excel(data, filename='produtos.xlsx'):
-    df = pd.DataFrame(data)
-    df.to_excel(filename, index=False)
-    print(f"Dados salvos em {filename}")
+    try:
+        import pandas as pd
+        df = pd.DataFrame(data)
+        df.to_excel(filename, index=False)
+        print(f"Dados salvos em {filename}")
+    except ImportError:
+        print("Pandas não disponível. Salvando apenas em JSON.")
+        save_to_json(data, filename.replace('.xlsx', '.json'))
 
 def save_to_json(data, filename='produtos.json'):
     with open(filename, 'w', encoding='utf-8') as f:

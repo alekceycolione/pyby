@@ -1,0 +1,74 @@
+2025-10-22 13:36:20,984 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.1.11:8080
+2025-10-22 13:36:20,984 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-22 13:36:20,984 - INFO -  * Restarting with stat
+2025-10-22 13:36:21,105 - WARNING -  * Debugger is active!
+2025-10-22 13:36:21,110 - INFO -  * Debugger PIN: 577-681-629
+2025-10-22 13:36:27,208 - INFO - 127.0.0.1 - - [22/Oct/2025 13:36:27] "GET /?ide_webview_request_time=1761150987200 HTTP/1.1" 200 -
+2025-10-22 13:36:27,285 - INFO - 127.0.0.1 - - [22/Oct/2025 13:36:27] "[33mGET /@vite/client HTTP/1.1[0m" 404 -
+2025-10-22 13:36:45,053 - INFO -  * Detected change in '/Users/alekceycolione/Documents/apps/extrair produtos do Compras Paraguai/scraper.py', reloading
+2025-10-22 13:36:45,072 - INFO -  * Restarting with stat
+2025-10-22 13:36:45,213 - WARNING -  * Debugger is active!
+2025-10-22 13:36:45,216 - INFO -  * Debugger PIN: 577-681-629
+2025-10-22 13:36:57,653 - INFO -  * Detected change in '/Users/alekceycolione/Documents/apps/extrair produtos do Compras Paraguai/scraper.py', reloading
+2025-10-22 13:36:57,675 - INFO -  * Restarting with stat
+2025-10-22 13:36:57,809 - WARNING -  * Debugger is active!
+2025-10-22 13:36:57,813 - INFO -  * Debugger PIN: 577-681-629
+2025-10-22 13:36:59,931 - INFO - 127.0.0.1 - - [22/Oct/2025 13:36:59] "[36mGET /?ide_webview_request_time=1761150987200 HTTP/1.1[0m" 304 -
+2025-10-22 13:36:59,940 - INFO - 127.0.0.1 - - [22/Oct/2025 13:36:59] "[36mGET /?ide_webview_request_time=1761150987200 HTTP/1.1[0m" 304 -
+2025-10-22 13:37:00,010 - INFO - 127.0.0.1 - - [22/Oct/2025 13:37:00] "[33mGET /@vite/client HTTP/1.1[0m" 404 -
+2025-10-22 13:37:02,993 - INFO - 127.0.0.1 - - [22/Oct/2025 13:37:02] "[36mGET /?ide_webview_request_time=1761150987200 HTTP/1.1[0m" 304 -
+2025-10-22 13:37:03,006 - INFO - 127.0.0.1 - - [22/Oct/2025 13:37:03] "[36mGET /?ide_webview_request_time=1761150987200 HTTP/1.1[0m" 304 -
+2025-10-22 13:37:03,082 - INFO - 127.0.0.1 - - [22/Oct/2025 13:37:03] "[33mGET /@vite/client HTTP/1.1[0m" 404 -
+2025-10-22 13:37:05,086 - INFO -  * Detected change in '/Users/alekceycolione/Documents/apps/extrair produtos do Compras Paraguai/scraper.py', reloading
+2025-10-22 13:37:05,106 - INFO -  * Restarting with stat
+2025-10-22 13:37:05,246 - WARNING -  * Debugger is active!
+2025-10-22 13:37:05,250 - INFO -  * Debugger PIN: 577-681-629
+2025-10-22 13:37:20,889 - INFO -  * Detected change in '/Users/alekceycolione/Documents/apps/extrair produtos do Compras Paraguai/scraper.py', reloading
+2025-10-22 13:37:20,906 - INFO -  * Restarting with stat
+2025-10-22 13:37:21,038 - WARNING -  * Debugger is active!
+2025-10-22 13:37:21,041 - INFO -  * Debugger PIN: 577-681-629
+2025-10-22 13:37:38,660 - INFO -  * Detected change in '/Users/alekceycolione/Documents/apps/extrair produtos do Compras Paraguai/scraper.py', reloading
+2025-10-22 13:37:38,693 - INFO -  * Restarting with stat
+2025-10-22 13:37:38,836 - WARNING -  * Debugger is active!
+2025-10-22 13:37:38,840 - INFO -  * Debugger PIN: 577-681-629
+2025-10-22 13:38:27,879 - INFO - 127.0.0.1 - - [22/Oct/2025 13:38:27] "GET / HTTP/1.1" 200 -
+2025-10-22 13:38:34,110 - INFO - 🔄 Iniciando nova requisição de scraping
+2025-10-22 13:38:34,110 - INFO - 📝 Dados recebidos - Termo: 'iphone', Frete: R$ 2000.00
+2025-10-22 13:38:34,110 - INFO - 🚀 Configurando driver do Chrome...
+2025-10-22 13:38:34,110 - INFO - 🔧 Configurando opções do Chrome...
+2025-10-22 13:38:34,110 - INFO - 📥 Instalando/configurando ChromeDriver...
+2025-10-22 13:38:34,110 - INFO - ====== WebDriver manager ======
+2025-10-22 13:38:34,163 - INFO - There is no [mac_arm64] chromedriver "latest" for browser google-chrome "141.0.7390" in cache
+2025-10-22 13:38:34,163 - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-22 13:38:34,656 - WARNING - ⚠️ Falha no webdriver-manager: There is no such driver by url https://chromedriver.storage.googleapis.com/LATEST_RELEASE_141.0.7390
+2025-10-22 13:38:34,657 - INFO - 🔄 Tentando caminho local do ChromeDriver...
+2025-10-22 13:38:34,657 - INFO - ✅ Usando ChromeDriver local
+2025-10-22 13:38:35,571 - INFO - 🚀 Driver do Chrome iniciado com sucesso
+2025-10-22 13:38:35,571 - INFO - ✅ Driver configurado com sucesso
+2025-10-22 13:38:35,572 - INFO - 🔍 Iniciando scraping para 'iphone'...
+2025-10-22 13:38:35,572 - INFO - 🌐 Iniciando scraping para termo: 'iphone'
+2025-10-22 13:38:35,572 - INFO - 📍 Navegando para: https://comprasparaguai.com.br/busca/?q=iphone
+2025-10-22 13:38:38,553 - INFO - ✅ Página carregada com sucesso
+2025-10-22 13:38:38,554 - INFO - 🍪 Verificando banner de cookies...
+2025-10-22 13:38:38,644 - INFO - ✅ Banner de cookies aceito
+2025-10-22 13:38:39,682 - INFO - 127.0.0.1 - - [22/Oct/2025 13:38:39] "GET /logs HTTP/1.1" 200 -
+2025-10-22 13:38:40,649 - INFO - 📜 Iniciando scroll para carregar produtos...
+2025-10-22 13:38:43,696 - INFO - 📜 Fim da página atingido
+2025-10-22 13:38:43,696 - INFO - 📜 Scroll concluído após 0 tentativas
+2025-10-22 13:38:43,696 - INFO - 💾 Salvando HTML da página para debug...
+2025-10-22 13:38:43,726 - INFO - ✅ HTML salvo em debug_page.html
+2025-10-22 13:38:43,726 - INFO - 🍲 Parseando HTML com BeautifulSoup...
+2025-10-22 13:38:43,792 - INFO - ✅ HTML parseado com sucesso
+2025-10-22 13:38:43,793 - INFO - 🔍 Procurando produtos na página...
+2025-10-22 13:38:43,796 - INFO - 📊 Encontrados 20 itens de produto
+2025-10-22 13:38:43,800 - INFO - 🎯 Scraping finalizado. Total de 20 produtos extraídos
+2025-10-22 13:38:43,800 - INFO - 📊 Scraping concluído. 20 produtos encontrados
+2025-10-22 13:38:43,800 - INFO - 💰 Calculando preços finais...
+2025-10-22 13:38:43,800 - INFO - 💾 Salvando resultados em produtos_iphone_20251022_133843.json...
+2025-10-22 13:38:43,801 - INFO - ✅ Arquivo JSON salvo com sucesso
+2025-10-22 13:38:43,801 - INFO - 🎉 Busca concluída com sucesso! 20 produtos encontrados
+2025-10-22 13:38:43,876 - INFO - 🔒 Driver fechado com sucesso
+2025-10-22 13:38:43,877 - INFO - 127.0.0.1 - - [22/Oct/2025 13:38:43] "POST /scrape HTTP/1.1" 200 -

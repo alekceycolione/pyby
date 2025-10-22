@@ -5,14 +5,20 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException, WebDriverException, NoSuchElementException
 from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 import json
 import time
 import re
 import os
+import logging
+
+# Configurar logging para o scraper
+logger = logging.getLogger(__name__)
 
 def setup_driver():
+    logger.info("🔧 Configurando opções do Chrome...")
     chrome_options = Options()
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
@@ -26,14 +32,33 @@ def setup_driver():
     chrome_options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
     
     # Usar webdriver-manager para gerenciar o ChromeDriver automaticamente
+    logger.info("📥 Instalando/configurando ChromeDriver...")
     try:
         service = Service(ChromeDriverManager().install())
-    except Exception:
+        logger.info("✅ ChromeDriver configurado via webdriver-manager")
+    except Exception as e:
+        logger.warning(f"⚠️ Falha no webdriver-manager: {str(e)}")
+        logger.info("🔄 Tentando caminho local do ChromeDriver...")
         # Fallback para caminho local se webdriver-manager falhar
         service = Service("/opt/homebrew/bin/chromedriver")
+        logger.info("✅ Usando ChromeDriver local")
     
-    driver = webdriver.Chrome(service=service, options=chrome_options)
-    return driver
+    try:
+        driver = webdriver.Chrome(service=service, options=chrome_options)
+        logger.info("🚀 Driver do Chrome iniciado com sucesso")
+        return driver
+    except ImportError as e:
+        logger.error(f"Erro de importação ao configurar driver: {e}")
+        logger.error("Verifique se o Chrome está instalado e o webdriver-manager está disponível")
+        return None
+    except FileNotFoundError as e:
+        logger.error(f"ChromeDriver não encontrado: {e}")
+        logger.error("Tentando usar ChromeDriver do sistema...")
+        return None
+    except Exception as e:
+        logger.error(f"Erro inesperado ao configurar driver: {e}")
+        logger.error(f"Tipo do erro: {type(e).__name__}")
+        return None
 
 def clean_price(price_str):
     if not price_str: return 'N/A'
@@ -57,55 +82,130 @@ def clean_price(price_str):
         return 'N/A'
 
 def scrape_products(driver, search_term):
+    logger.info(f"🌐 Iniciando scraping para termo: '{search_term}'")
     base_url = "https://comprasparaguai.com.br"
     search_url = f"{base_url}/busca/?q={search_term}"
-    driver.get(search_url)
+    
+    logger.info(f"📍 Navegando para: {search_url}")
+    try:
+        driver.get(search_url)
+        logger.info("✅ Página carregada com sucesso")
+    except TimeoutException as e:
+        logger.error(f"⏰ Timeout ao carregar página: {str(e)}")
+        logger.error("A página demorou muito para carregar. Verifique a conexão com a internet.")
+        raise
+    except WebDriverException as e:
+        logger.error(f"🚫 Erro do WebDriver ao carregar página: {str(e)}")
+        logger.error("Possível problema com o navegador ou driver.")
+        raise
+    except Exception as e:
+        logger.error(f"❌ Erro inesperado ao carregar página: {str(e)}")
+        logger.error(f"Tipo do erro: {type(e).__name__}")
+        raise
 
     # Aceitar cookies, se presente
+    logger.info("🍪 Verificando banner de cookies...")
     try:
-        WebDriverWait(driver, 10).until(
+        cookie_button = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'ENTENDI')] | //button[contains(text(), 'Estou de Acordo')] | //*[@id='btn-cookie-allow']"))
-        ).click()
+        )
+        cookie_button.click()
+        logger.info("✅ Banner de cookies aceito")
         time.sleep(2) # Dar um tempo para o banner de cookies sumir
-    except Exception:
-        pass # Elemento de cookie não encontrado ou já aceito
+    except Exception as e:
+        logger.info("ℹ️ Banner de cookies não encontrado ou já aceito")
 
     products_data = []
     
     # Rolar a página para carregar mais produtos (se houver lazy loading)
+    logger.info("📜 Iniciando scroll para carregar produtos...")
     last_height = driver.execute_script("return document.body.scrollHeight")
     scroll_attempts = 0
     max_scroll_attempts = 5 # Ajustar conforme necessário
+    
     while scroll_attempts < max_scroll_attempts:
+        logger.debug(f"📜 Scroll tentativa {scroll_attempts + 1}/{max_scroll_attempts}")
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         time.sleep(3)  # Esperar o conteúdo carregar
         new_height = driver.execute_script("return document.body.scrollHeight")
         if new_height == last_height:
+            logger.info("📜 Fim da página atingido")
             break
         last_height = new_height
         scroll_attempts += 1
+    
+    logger.info(f"📜 Scroll concluído após {scroll_attempts} tentativas")
 
     # Salvar o HTML da página para depuração
-    with open("debug_page.html", "w", encoding="utf-8") as f:
-        f.write(driver.page_source)
-    print("HTML da página salvo em debug_page.html para depuração.")
+    logger.info("💾 Salvando HTML da página para debug...")
+    try:
+        with open("debug_page.html", "w", encoding="utf-8") as f:
+            f.write(driver.page_source)
+        logger.info("✅ HTML salvo em debug_page.html")
+    except Exception as e:
+        logger.warning(f"⚠️ Erro ao salvar HTML de debug: {str(e)}")
 
     # Usar BeautifulSoup para parsear o HTML após o carregamento dinâmico
-    soup = BeautifulSoup(driver.page_source, 'html.parser')
+    logger.info("🍲 Parseando HTML com BeautifulSoup...")
+    try:
+        soup = BeautifulSoup(driver.page_source, 'html.parser')
+        logger.info("✅ HTML parseado com sucesso")
+    except Exception as e:
+        logger.error(f"❌ Erro ao parsear HTML com BeautifulSoup: {str(e)}")
+        logger.error("Possível problema com o conteúdo HTML ou parser")
+        # Tentar com parser alternativo
+        try:
+            logger.info("🔄 Tentando parser alternativo...")
+            soup = BeautifulSoup(driver.page_source, 'lxml')
+            logger.info("✅ HTML parseado com parser lxml")
+        except Exception as e2:
+            logger.error(f"❌ Erro também com parser lxml: {str(e2)}")
+            try:
+                logger.info("🔄 Tentando parser html.parser básico...")
+                soup = BeautifulSoup(driver.page_source, 'html.parser')
+                logger.info("✅ HTML parseado com parser básico")
+            except Exception as e3:
+                logger.error(f"❌ Falha total no parsing: {str(e3)}")
+                raise Exception("Não foi possível parsear o HTML com nenhum parser disponível")
 
     # Extrair dados dos produtos
+    logger.info("🔍 Procurando produtos na página...")
     product_items = soup.find_all('div', class_='promocao-produtos-item')
-    print(f"Encontrados {len(product_items)} itens de produto.")
+    logger.info(f"📊 Encontrados {len(product_items)} itens de produto")
 
-    for item in product_items:
+    if len(product_items) == 0:
+        logger.warning("⚠️ Nenhum produto encontrado! Verificando estrutura da página...")
+        # Tentar encontrar outros seletores possíveis
+        alternative_selectors = [
+            'div.produto-item',
+            'div.product-item', 
+            'div[class*="produto"]',
+            'div[class*="product"]',
+            'article',
+            '.card'
+        ]
+        
+        for selector in alternative_selectors:
+            try:
+                items = soup.select(selector)
+                if items:
+                    logger.info(f"🔍 Encontrados {len(items)} itens com seletor alternativo: {selector}")
+                    break
+            except Exception as e:
+                logger.debug(f"Seletor {selector} falhou: {str(e)}")
+
+    for i, item in enumerate(product_items):
+        logger.debug(f"🔍 Processando produto {i+1}/{len(product_items)}")
         try:
             name_tag = item.find('div', class_='promocao-item-nome')
             name = name_tag.a.text.strip() if name_tag and name_tag.a else 'N/A'
+            logger.debug(f"📝 Nome: {name}")
 
             link_tag = item.find('div', class_='promocao-item-nome')
             link = link_tag.a['href'] if link_tag and link_tag.a and 'href' in link_tag.a.attrs else 'N/A'
             if link and not link.startswith('http'):
                 link = base_url + link
+            logger.debug(f"🔗 Link: {link}")
 
             price_usd = 'N/A'
             price_brl = 'N/A'
@@ -117,6 +217,7 @@ def scrape_products(driver, search_term):
                 match_usd = re.search(r'US\$\s*([\d\.,]+)', price_usd_text)
                 if match_usd:
                     price_usd = clean_price(match_usd.group(1))
+                    logger.debug(f"💵 Preço USD: {price_usd}")
 
             # Extração do preço em real
             price_brl_element = item.select_one('.promocao-item-preco-text')
@@ -125,6 +226,7 @@ def scrape_products(driver, search_term):
                 match_brl = re.search(r'R\$\s*([\d\.,]+)', price_brl_text)
                 if match_brl:
                     price_brl = clean_price(match_brl.group(1))
+                    logger.debug(f"💰 Preço BRL: {price_brl}")
 
             # Extração da URL da imagem
             image_url = 'N/A'
@@ -144,17 +246,38 @@ def scrape_products(driver, search_term):
                 # Se a URL da imagem ainda for 'N/A' ou vazia, garantir que não seja concatenada com o base_url
                 if not image_url or 'N/A' in image_url:
                     image_url = 'N/A'
+                    
+                logger.debug(f"🖼️ Imagem: {image_url}")
 
-            products_data.append({
+            product_data = {
                 'Nome': name,
                 'Preço (US$)': price_usd,
                 'Preço (R$)': price_brl,
                 'Link': link,
                 'Imagem': image_url
-            })
-        except Exception as e:
-            print(f"Erro ao extrair produto: {e}")
+            }
+            
+            products_data.append(product_data)
+            logger.debug(f"✅ Produto {i+1} processado com sucesso")
+            
+        except AttributeError as e:
+            logger.error(f"❌ Erro de atributo ao extrair produto {i+1}: {str(e)}")
+            logger.error("Possível mudança na estrutura HTML da página")
             continue
+        except KeyError as e:
+            logger.error(f"❌ Chave não encontrada ao extrair produto {i+1}: {str(e)}")
+            logger.error("Elemento HTML esperado não possui o atributo necessário")
+            continue
+        except TypeError as e:
+            logger.error(f"❌ Erro de tipo ao extrair produto {i+1}: {str(e)}")
+            logger.error("Tipo de dados inesperado durante a extração")
+            continue
+        except Exception as e:
+            logger.error(f"❌ Erro inesperado ao extrair produto {i+1}: {str(e)}")
+            logger.error(f"Tipo do erro: {type(e).__name__}")
+            continue
+    
+    logger.info(f"🎯 Scraping finalizado. Total de {len(products_data)} produtos extraídos")
     return products_data
 
 def save_to_excel(data, filename='produtos.xlsx'):

@@ -3,8 +3,8 @@ services:
     name: scraper-compras-paraguai
     env: python
     plan: free
-    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
-    startCommand: gunicorn app:app
+    buildCommand: pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
+    startCommand: gunicorn app:app --timeout 120 --workers 1
     envVars:
       - key: FLASK_ENV
         value: production
@@ -12,7 +12,5 @@ services:
         value: /opt/render/project/src
       - key: PIP_NO_CACHE_DIR
         value: "1"
-    disk:
-      name: scraper-disk
-      mountPath: /opt/render/project/src/data
-      sizeGB: 1
+      - key: PYTHONUNBUFFERED
+        value: "1"

@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: scraper-compras-paraguai
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: PYTHONPATH
+        value: /opt/render/project/src
+    disk:
+      name: scraper-disk
+      mountPath: /opt/render/project/src/data
+      sizeGB: 1

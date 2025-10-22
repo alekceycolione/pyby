@@ -81,7 +81,12 @@ def download_file(filename):
         return jsonify({'error': 'Arquivo não encontrado'}), 404
 
 if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 8080))
+    debug = os.environ.get('FLASK_ENV') != 'production'
+    
     print("🚀 Iniciando servidor do Scraper Compras Paraguai...")
-    print("📱 Acesse: http://localhost:8080")
+    if debug:
+        print(f"📱 Acesse: http://localhost:{port}")
     print("🛑 Para parar: Ctrl+C")
-    app.run(debug=True, host='0.0.0.0', port=8080)
+    
+    app.run(debug=debug, host='0.0.0.0', port=port)
